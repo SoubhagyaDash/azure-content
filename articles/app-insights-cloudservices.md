@@ -18,7 +18,8 @@
 # Application Insights for Azure Cloud Services
 
 **DRAFT -- TBD items**
-* Add images
+* Add portal experience images
+* Add code snippets
 * Fix links to sample code
 
 
