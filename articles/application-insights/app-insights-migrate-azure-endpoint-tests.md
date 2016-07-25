@@ -1,6 +1,6 @@
 <properties 
 	pageTitle="Migrate Azure Endpoint to Application Insights Availability Tests" 
-	description="We've moved your classic Azure Endpoint Monitoring tests into Application Insights availability tests. We will switch over to them on April 4th, 2016."
+	description="We are moving your classic Azure Endpoint Monitoring tests into Application Insights availability tests. We expect to switch over to them during the week of August 22, 2016."
 	services="application-insights" 
     documentationCenter=""
 	authors="soubhagyadash" 
@@ -17,7 +17,7 @@
  
 # Moving from Azure Endpoint Monitoring to Application Insights Availability Tests
 
-Do you use [Endpoint monitoring](https://blogs.msdn.microsoft.com/mast/2013/03/03/windows-azure-portal-update-configure-web-endpoint-status-monitoring-preview/) for your Azure web apps? On April 4th 2016, we'll replace them with the new and more powerful [Availability tests](app-insights-monitor-web-app-availability.md). We have already created the new tests, although they're disabled until April 4th. 
+Do you use [Endpoint monitoring](https://blogs.msdn.microsoft.com/mast/2013/03/03/windows-azure-portal-update-configure-web-endpoint-status-monitoring-preview/) for your Azure apps? During the week of August 22, 2016, we'll replace them with the new and more powerful [Availability tests](app-insights-monitor-web-app-availability.md). We have already created some of the new tests, although they're disabled until August 22nd 2016. 
 
 You can edit the new tests and do the switch yourself if you want. You'll find them [Azure portal](https://portal.azure.com) in the Default-ApplicationInsights-CentralUS resource group.
 
@@ -44,7 +44,7 @@ Availability tests are part of [Visual Studio Application Insights](app-insights
 
 ## So what's happening to my endpoint tests?
 
-* We have copied your endpoint monitoring tests to the new Application Insights Availability tests. We copied them on March 4th, 2016, so we won't have copied any Endpoint tests you created since then.
+* We have copied your endpoint monitoring tests to the new Application Insights Availability tests.
 * The new Availability tests are currently disabled, and the old Endpoint tests are still running.
 * The alerting rules have *not* been migrated. The new tests have initially been set up with a default rule:
  * Triggers when more than 1 location reports failures in 5 minutes.
@@ -54,11 +54,11 @@ In the [Azure portal](https://portal.azure.com), you can find the migrated tests
 
 ## What do I need to do?
 
-* If you created the legacy tests after March 4, 2016 (or we somehow missed migrating your tests), the new availability tests are [easy to set up](app-insights-monitor-web-app-availability.md).
+* If we somehow missed migrating your tests, the new availability tests are [easy to set up](app-insights-monitor-web-app-availability.md).
 
 ### Option A: Do nothing. Leave it to us.
 
-**On April 4th,** we will:
+**During the week of August 22nd, 2016,** we will:
 
 * Disable the old endpoint tests.
 * Enable the migrated Availability tests.
@@ -136,7 +136,3 @@ Option A will apply. We will enable the migrated tests, and set up the default a
 ## Where can I provide feedback on this? 
 
 We appreciate your feedback. Please [email us](mailto:vsai@microsoft.com). 
-
-
-
-
