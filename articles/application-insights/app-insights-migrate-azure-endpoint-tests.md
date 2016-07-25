@@ -69,14 +69,14 @@ In the [Azure portal](https://portal.azure.com), you can find the migrated tests
  * Review the trigger criteria
  * Review the email recipients
 * Enable the new tests
-* Delete the old endpoint tests [in the classic portal](https://manage.windowsazure.com). We recommend this to avoid duplicate alerts and reduce the load of test traffic on your web site. If not, we'll delete them on April 4th, 2016.
+* Delete the old endpoint tests [in the classic portal](https://manage.windowsazure.com). We recommend this to avoid duplicate alerts and reduce the load of test traffic on your web site. If not, we'll delete them on August 22nd, 2016.
 
 
 ### Option C: Opt out
 
 If you don't want to use Availability tests, you can delete them in [Azure portal](https://portal.azure.com). There's also an Unsubscribe link at the bottom of the notification emails.
 
-We will still delete the old endpoint tests on April 4th. 
+We will still delete the old endpoint tests on August 22nd, 2016. 
 
 ## How do I edit the new tests?
 
