@@ -1,21 +1,6 @@
-<properties 
-   pageTitle="Take a backup"
-   description="Describes how to define a StorSimple backup policy."
-   services="storsimple"
-   documentationCenter="NA"
-   authors="SharS"
-   manager="adinah"
-   editor="tysonn" />
-<tags 
-   ms.service="storsimple"
-   ms.devlang="NA"
-   ms.topic="article"
-   ms.tgt_pltfrm="NA"
-   ms.workload="TBD"
-   ms.date="04/29/2015"
-   ms.author="v-sharos" />
+<!--author=alkohli last changed: 9/17/15-->
 
-#### To take a backup
+### To take a backup
 
 1. On the device **Quick Start** page, click **Add a backup policy**. This will start the Add Backup Policy wizard. 
 
@@ -40,4 +25,6 @@
 
 You have completed the device configuration. 
 
+![Video available](./media/storsimple-take-backup/Video_icon.png) **Video available**
 
+To watch a video that demonstrates how to take a StorSimple backup, click [here](https://azure.microsoft.com/documentation/videos/take-a-storsimple-backup/).

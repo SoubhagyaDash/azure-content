@@ -1,255 +1,192 @@
 <properties
-   pageTitle="Deploy an application with Azure Resource Manager Template"
-   services="azure-portal"
-   description="Use Azure Resource Manager to deploy an application to Azure. A template is a JSON file and can be used from the Portal, PowerShell, the Azure Command-Line Interface for Mac, Linux, and Windows, or REST."
+   pageTitle="Deploy resources with PowerShell and template | Microsoft Azure"
+   description="Use Azure Resource Manager and Azure PowerShell to deploy a resources to Azure. The resources are defined in a Resource Manager template."
+   services="azure-resource-manager"
    documentationCenter="na"
    authors="tfitzmac"
-   manager="wpickett"
-   editor=""/>
+   manager="timlt"
+   editor="tysonn"/>
 
 <tags
-   ms.service="azure-portal"
+   ms.service="azure-resource-manager"
    ms.devlang="na"
    ms.topic="article"
    ms.tgt_pltfrm="na"
    ms.workload="na"
-   ms.date="04/29/2015"
-   ms.author="tomfitz;ryjones"/>
+   ms.date="07/11/2016"
+   ms.author="tomfitz"/>
 
-# Deploy an application with Azure Resource Manager template
+# Deploy resources with Resource Manager templates and Azure PowerShell
 
-This topic explains how to use Azure Resource Manager templates to deploy your application to Azure. It shows how deploy your application by using either Azure PowerShell, Azure CLI, REST API, or the Microsoft Azure preview portal.
+> [AZURE.SELECTOR]
+- [PowerShell](resource-group-template-deploy.md)
+- [Azure CLI](resource-group-template-deploy-cli.md)
+- [Portal](resource-group-template-deploy-portal.md)
+- [REST API](resource-group-template-deploy-rest.md)
+- [.NET](https://azure.microsoft.com/documentation/samples/resource-manager-dotnet-template-deployment/)
+- [Java](https://azure.microsoft.com/documentation/samples/resources-java-deploy-using-arm-template/)
+- [Python](https://azure.microsoft.com/documentation/samples/resource-manager-python-template-deployment/)
+- [Node](https://azure.microsoft.com/documentation/samples/resource-manager-node-template-deployment/)
+- [Ruby](https://azure.microsoft.com/documentation/samples/resource-manager-ruby-template-deployment/)
 
-Azure Resource Manager templates enable you to quickly and easily provision your applications in Azure via declarative JSON. In a single JSON template, you can deploy multiple services, such as Virtual Machines, Virtual Networks, Storage, App Services, and databases. You use the same template to repeatedly and consistently deploy your application during every stage of the application lifecycle.
 
-To simplify management of your application, you can organize all of the resources that share a common lifecycle into a single resource group. Resource groups make it easy to deploy, update, and delete all of the related resources together. In most cases, a resource group maps to either a single application or an application tier (for large applications). The resource deployed through a template will reside within a single resource groups, but they can include dependencies in other resource groups.   
+This topic explains how to use Azure PowerShell with Resource Manager templates to deploy your resources to Azure.  
 
-Within a resource group, you can track the execution of a deployment, and see the status of the deployment and any output from template execution.
+> [AZURE.TIP] For help with debugging an error during deployment, see:
+>
+> - [View deployment operations with Azure PowerShell](resource-manager-troubleshoot-deployments-powershell.md) to learn about getting information that will help you troubleshoot your error
+> - [Troubleshoot common errors when deploying resources to Azure with Azure Resource Manager](resource-manager-common-deployment-errors.md) to learn how to resolve common deployment errors
 
-When deploying an application with a template, you can provide parameter values to customize how the resources are created.  You specify values for these parameters either inline or in a parameter file.
+Your template can be either a local file or an external file that is available through a URI. When your template resides in a storage account, you can restrict access to the template and provide a shared access signature (SAS) token during deployment.
 
-## Concepts
+## Quick steps to deployment
 
-- Resource Group - collection of entities that share a common lifecycle
-- Resource Manager Template - declarative JSON file that defines the goal state of a deployment
-- Deployment - operation which tracks execution of a Resource Manager template
-- Parameters - values provided by the user executing the deployment to customize deployed resources
-- Parameter file - JSON file that stores parameter names and values 
+This article describes all of the different options available to you during deployment. However, very often you will only need two simple commands. To quickly get started with deployment, use the following commands:
 
-## Scenarios
+    New-AzureRmResourceGroup -Name ExampleResourceGroup -Location "West US"
+    New-AzureRmResourceGroupDeployment -Name ExampleDeployment -ResourceGroupName ExampleResourceGroup -TemplateFile <PathToTemplate> -TemplateParameterFile <PathToParameterFile>
 
-With Resource Manager templates, you can:
+To learn more about options for deployment that might be better suited to your scenario, continue reading this article.
 
-- Deploy complex multitier applications, such as Microsoft SharePoint.
-- Consistently and repeatedly deploy your applications.
-- Support dev, test, and production environments.
-- View the status of deployments.
-- Troubleshoot deployment failures using deployment audit logs.
-
-## Deploy with the preview portal
-
-Guess what?  Every application in the Gallery is backed by an Azure Resource Manager template!  By simply creating a Virtual Machine, Virtual Network, Storage Account, App Service, or database through the portal, you're already reaping the benefits of Azure Resource Manager without additional effort.
-
-To troubleshoot deployments through the preview portal, click **Browse** -> **Resource Groups** -> *YourResourceGroupName*.  From here, click on the **Events** tile under the **Monitoring** lens.  Finally, you can select an individual **operation** and **event** to view details.
+[AZURE.INCLUDE [resource-manager-deployments](../includes/resource-manager-deployments.md)]
 
 ## Deploy with PowerShell
 
-If you have not previously used Azure PowerShell with Resource Manager, see [Using Azure PowerShell with Azure Resource Manager](./powershell-azure-resource-manager.md).
+1. Login to your Azure account.
 
-1. Login to your Azure account. After providing your credentials, the command returns information about your account.
+        Add-AzureRmAccount
 
-        PS C:\> Add-AzureAccount
+     A summary of your account is returned.
 
-        Id                             Type       ...
-        --                             ----    
-        someone@example.com            User       ...   
+        Environment : AzureCloud
+        Account     : someone@example.com
+        ...
 
-2. If you have multiple subscriptions, provide the subscription id you wish to use for deployment. 
+2. If you have multiple subscriptions, provide the subscription ID you wish to use for deployment with the **Set-AzureRmContext** command. 
 
-        PS C:\> Select-AzureSubscription -SubscriptionID <YourSubscriptionId>
+        Set-AzureRmContext -SubscriptionID <YourSubscriptionId>
 
-3. Switch to the Azure Resource Manager module.
+3. Typically, when deploying a new template, you will want to create a new resource group to contain the resources. If you have an existing resource group that you wish to deploy to, you can skip this step and simply use that resource group. 
 
-        PS C:\> Switch-AzureMode AzureResourceManager
+     To create a new resource group, provide a name and location for your resource group. 
 
-4. If you do not have an existing resource group, create a new resource group. Provide the name of the resource group and location that you need for your solution. A summary of the new resource group is returned.
-
-        PS C:\> New-AzureResourceGroup -Name ExampleResourceGroup -Location "West US"
+        New-AzureRmResourceGroup -Name ExampleResourceGroup -Location "West US"
+   
+     A summary of the new resource group is returned.
    
         ResourceGroupName : ExampleResourceGroup
         Location          : westus
         ProvisioningState : Succeeded
         Tags              :
         Permissions       :
-                    Actions  NotActions
-                    =======  ==========
-                    *
+             Actions  NotActions
+             =======  ==========
+             *
         ResourceId        : /subscriptions/######/resourceGroups/ExampleResourceGroup
 
-5. To create a new deployment for your resource group, run the **New-AzureResourceGroupDeployment** command and provide the necessary parameters. The parameters will include a name for your deployment, the name of your resource group, the path or URL to the template you created, and any other parameters needed for your scenario.
+4. Prior to executing your deployment, you can validate your deployment settings. The **Test-AzureRmResourceGroupDeployment** cmdlet enables you to find problems before creating actual resources. The following example shows how to validate a deployment.
+
+        Test-AzureRmResourceGroupDeployment -ResourceGroupName ExampleResourceGroup -TemplateFile <PathToTemplate>
+
+5. To create a new deployment for your resource group, run the **New-AzureRmResourceGroupDeployment** command and provide the necessary parameters. The parameters will include a name for your deployment, the name of your resource group, the path or URL to the template you created, and any other parameters needed for your scenario. If the **Mode** parameter is not specified, the default value of **Incremental** is used. To run a complete deployment, set **Mode** to **Complete**. Be careful when using the complete mode as you can inadvertently delete resources that are not in your template.
+
+     To deploy a local template, use the **TemplateFile** parameter:
+
+        New-AzureRmResourceGroupDeployment -Name ExampleDeployment -ResourceGroupName ExampleResourceGroup -TemplateFile <PathToTemplate>
+
+     To deploy an external template, use **TemplateUri** parameter:
+
+        New-AzureRmResourceGroupDeployment -Name ExampleDeployment -ResourceGroupName ExampleResourceGroup -TemplateUri <LinkToTemplate>
    
      You have the following options for providing parameter values: 
    
-     - Use inline parameters.
+     1. Use inline parameters.
 
-            PS C:\> New-AzureResourceGroupDeployment -Name ExampleDeployment -ResourceGroupName ExampleResourceGroup -TemplateFile <PathOrLinkToTemplate> -myParameterName "parameterValue"
+            New-AzureRmResourceGroupDeployment -Name ExampleDeployment -ResourceGroupName ExampleResourceGroup -TemplateFile <PathToTemplate> -myParameterName "parameterValue"
 
-     - Use a parameter object.
+     2. Use a parameter object.
 
-            PS C:\> $parameters = @{"<ParameterName>"="<Parameter Value>"}
-            PS C:\> New-AzureResourceGroupDeployment -Name ExampleDeployment -ResourceGroupName ExampleResourceGroup -TemplateFile <PathOrLinkToTemplate> -TemplateParameterObject $parameters
+            $parameters = @{"<ParameterName>"="<Parameter Value>"}
+            New-AzureRmResourceGroupDeployment -Name ExampleDeployment -ResourceGroupName ExampleResourceGroup -TemplateFile <PathToTemplate> -TemplateParameterObject $parameters
 
-     - Using a parameter file. For information about the template file, see [Parameter file](./#parameter-file).
+     3. Use a local parameter file. For information about the template file, see [Parameter file](#parameter-file).
 
-            PS C:\> New-AzureResourceGroupDeployment -Name ExampleDeployment -ResourceGroupName ExampleResourceGroup -TemplateFile <PathOrLinkToTemplate> -TemplateParameterFile <PathOrLinkToParameterFile>
+            New-AzureRmResourceGroupDeployment -Name ExampleDeployment -ResourceGroupName ExampleResourceGroup -TemplateFile <PathToTemplate> -TemplateParameterFile <PathToParameterFile>
 
-     When the resource group has been deployed, you will see a summary of the deployment.
+     4. Use an external parameter file. For information about the template file, see [Parameter file](#parameter-file).
 
-          DeploymentName    : ExampleDeployment
-          ResourceGroupName : ExampleResourceGroup
-          ProvisioningState : Succeeded
-          Timestamp         : 4/14/2015 7:00:27 PM
-          Mode              : Incremental
-          ...
+            New-AzureRmResourceGroupDeployment -Name ExampleDeployment -ResourceGroupName ExampleResourceGroup -TemplateUri <LinkToTemplate> -TemplateParameterUri <LinkToParameterFile>
 
-6. To get information about deployment failures.
+     After the resources have been deployed, you will see a summary of the deployment.
 
-        PS C:\> Get-AzureResourceGroupLog -ResourceGroup ExampleResourceGroup -Status Failed
-
-7. To get detailed information about deployment failures.
-
-        PS C:\> Get-AzureResourceGroupLog -ResourceGroup ExampleResourceGroup -Status Failed -DetailedOutput
-
-## Deploy with Azure CLI for Mac, Linux and Windows
-
-If you have not previously used Azure CLI with Resource Manager, see [Using the Azure CLI for Mac, Linux, and Windows with Azure Resource Management](./xplat-cli-azure-resource-manager.md).
-
-1. Login to your Azure account. After providing your credentials, the command returns the result of your login.
-
-        azure login
-  
+        DeploymentName    : ExampleDeployment
+        ResourceGroupName : ExampleResourceGroup
+        ProvisioningState : Succeeded
+        Timestamp         : 4/14/2015 7:00:27 PM
+        Mode              : Incremental
         ...
-        info:    login command OK
 
-2. If you have multiple subscriptions, provide the subscription id you wish to use for deployment.
+     If the template includes a parameter with a name that matches one of the parameters in the command to deploy the template (such as including a parameter named **ResourceGroupName** in your template which is the same as the **ResourceGroupName** parameter in the [New-AzureRmResourceGroupDeployment](https://msdn.microsoft.com/library/azure/mt679003.aspx) cmdlet), you will be prompted to provide a value for a parameter with the postfix **FromTemplate** (such as **ResourceGroupNameFromTemplate**). In general, you should avoid this confusion by not naming parameters with the same name as parameters used for deployment operations.
 
-        azure account set <YourSubscriptionNameOrId>
+6. If you want to log additional information about the deployment that may help you troubleshoot any deployment errors, use the **DeploymentDebugLogLevel** parameter. You can specify that request content, response content, or both be logged with the deployment operation.
 
-3. Switch to Azure Resource Manager module. You will receive confirmation of the new mode.
+        New-AzureRmResourceGroupDeployment -Name ExampleDeployment -DeploymentDebugLogLevel All -ResourceGroupName ExampleResourceGroup -TemplateFile <PathOrLinkToTemplate>
+        
+     For more information about using this debugging content to troubleshoot deployments, see [Troubleshooting resource group deployments with Azure PowerShell](resource-manager-troubleshoot-deployments-powershell.md).
 
-        azure config mode arm
-   
-        info:     New mode is arm
+## Deploy template from storage with SAS token
 
-4. If you do not have an existing resource group, create a new resource group. Provide the name of the resource group and location that you need for your solution. A summary of the new resource group is returned.
+You can add your templates to a storage account and link to them during deployment with a SAS token.
 
-        azure group create -n ExampleResourceGroup -l "West US"
-   
-        info:    Executing command group create
-        + Getting resource group ExampleResourceGroup
-        + Creating resource group ExampleResourceGroup
-        info:    Created resource group ExampleResourceGroup
-        data:    Id:                  /subscriptions/####/resourceGroups/ExampleResourceGroup
-        data:    Name:                ExampleResourceGroup
-        data:    Location:            westus
-        data:    Provisioning State:  Succeeded
-        data:    Tags:
-        data:
-        info:    group create command OK
+> [AZURE.IMPORTANT] By following the steps below, the blob containing the template is accessible to only the account owner. However, when you create a SAS token for the blob, the blob is accessible to anyone with that URI. If another user intercepts the URI, that user is able to access the template. Using a SAS token is a good way of limiting access to your templates, but you should not include sensitive data like passwords directly in the template.
 
-5. To create a new deployment for your resource group, run the following command and provide the necessary parameters. The parameters will include a name for your deployment, the name of your resource group, the path or URL to the template you created, and any other parameters needed for your scenario. 
-   
-     You have the following options for providing parameter values: 
+### Add private template to storage account
 
-     - Use inline parameters and a local template.
+The following steps set up a storage account for templates:
 
-             azure group deployment create -f <PathToTemplate> {"ParameterName":"ParameterValue"} -g ExampleResourceGroup -n ExampleDeployment
+1. Create a new resource group.
 
-     - Use inline parameters and a link to a template.
+        New-AzureRmResourceGroup -Name ManageGroup -Location "West US"
 
-             azure group deployment create --template-uri <LinkToTemplate> {"ParameterName":"ParameterValue"} -g ExampleResourceGroup -n ExampleDeployment
+2. Create a new storage account. The storage account name must be unique across Azure, so provide your own name for the account.
 
-     - Use a parameter file. For information about the template file, see [Parameter file](./#parameter-file).
-    
-             azure group deployment create -f <PathToTemplate> -e <PathToParameterFile> -g ExampleResourceGroup -n ExampleDeployment
+        New-AzureRmStorageAccount -ResourceGroupName ManageGroup -Name storagecontosotemplates -Type Standard_LRS -Location "West US"
 
-     When the resource group has been deployed, you will see a summary of the deployment.
-  
-           info:    Executing command group deployment create
-           + Initializing template configurations and parameters
-           + Creating a deployment
-           ...
-           info:    group deployment create command OK
+3. Set the current storage account.
 
+        Set-AzureRmCurrentStorageAccount -ResourceGroupName ManageGroup -Name storagecontosotemplates
 
-6. To get information about your latest deployment.
+4. Create a new container. The permission is set to **Off** which means the container is only accessible to the owner.
 
-         azure group log show -l ExampleResourceGroup
+        New-AzureStorageContainer -Name templates -Permission Off
+        
+5. Add your template to the container.
 
-7. To get detailed information about deployment failures.
-      
-         azure group log show -l -v ExampleResourceGroup
+        Set-AzureStorageBlobContent -Container templates -File c:\Azure\Templates\azuredeploy.json
+        
+### Provide SAS token during deployment
 
-## Deploy with the REST API
-1. Set [common parameters and headers](https://msdn.microsoft.com/library/azure/8d088ecc-26eb-42e9-8acc-fe929ed33563#bk_common), including authentication tokens.
-2. If you do not have an existing resource group, create a new resource group. Provide your subscription id, the name of the new resource group, and location that you need for your solution. For more information, see [Create a resource group](https://msdn.microsoft.com/library/azure/dn790525.aspx).
+To deploy a private template in a storage account, retrieve a SAS token and include it in the URI for the template.
 
-         PUT https://management.azure.com/subscriptions/<YourSubscriptionId>/resourcegroups/<YourResourceGroupName>?api-version=2015-01-01
-           <common headers>
-           {
-             "location": "West US",
-             "tags": {
-               "tagname1": "tagvalue1"
-             }
-           }
-   
-3. Create a new resource group deployment. Provide your subscription id, the name of the resource group to deploy, the name of the deployment, and the location of your template. For information about the template file, see [Parameter file](./#parameter-file). For more information about the REST API to create a resource group, see [Create a template deployment](https://msdn.microsoft.com/library/azure/dn790564.aspx).
-    
-         PUT https://management.azure.com/subscriptions/<YourSubscriptionId>/resourcegroups/<YourResourceGroupName>/providers/Microsoft.Resources/deployments/<YourDeploymentName>?api-version=2015-01-01
-            <common headers>
-            {
-              "properties": {
-                "templateLink": {
-                  "uri": "http://mystorageaccount.blob.core.windows.net/templates/template.json",
-                  "contentVersion": "1.0.0.0",
-                },
-                "mode": "Incremental",
-                "parametersLink": {
-                  "uri": "http://mystorageaccount.blob.core.windows.net/templates/parameters.json",
-                  "contentVersion": "1.0.0.0",
-                }
-              }
-            }
-   
-4. Get the status of the template deployment. For more information, see [Get information about a template deployment](https://msdn.microsoft.com/library/azure/dn790565.aspx).
+1. If you have changed the current storage account, set the current storage account to the one containing your templates.
 
-         GET https://management.azure.com/subscriptions/<YourSubscriptionId>/resourcegroups/<YourResourceGroupName>/providers/Microsoft.Resources/deployments/<YourDeploymentName>?api-version=2015-01-01
-           <common headers>
+        Set-AzureRmCurrentStorageAccount -ResourceGroupName ManageGroup -Name storagecontosotemplates
 
-## Parameter file
+2. Create a SAS token with read permissions and an expiry time to limit access. Retrieve the full URI of the template including the SAS token.
 
-If you use a parameter file to pass the parameter values to your template during deployment, you'll need to create a JSON file with a format similar to the following example.
+        $templateuri = New-AzureStorageBlobSASToken -Container templates -Blob azuredeploy.json -Permission r -ExpiryTime (Get-Date).AddHours(2.0) -FullUri
 
-    {
-        "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
-        "contentVersion": "1.0.0.0",
-        "parameters": {
-            "webSiteName": {
-                "value": "ExampleSite"
-            },
-            "webSiteHostingPlanName": {
-                "value": "DefaultPlan"
-            },
-            "webSiteLocation": {
-                "value": "West US"
-            }
-       }
-    }
+3. Deploy the template by providing the URI that includes the SAS token.
+
+        New-AzureRmResourceGroupDeployment -ResourceGroupName ExampleResourceGroup -TemplateUri $templateuri
+
+For an example of using a SAS token with linked templates, see [Using linked templates with Azure Resource Manager](resource-group-linked-templates.md).
+
+[AZURE.INCLUDE [resource-manager-parameter-file](../includes/resource-manager-parameter-file.md)]
 
 ## Next steps
-- [Azure Resource Manager Overview](./resource-group-overview.md)
-- [Deploy resources using .NET libraries and a template](./arm-template-deployment.md)
-- [Authoring templates](./resource-group-authoring-templates.md)
-- [Template functions](./resource-group-template-functions.md)
-- [Advanced template operations](./resource-group-advanced-template.md)  
+- For an example of deploying resources through the .NET client library, see [Deploy resources using .NET libraries and a template](virtual-machines/virtual-machines-windows-csharp-template.md).
+- To define parameters in template, see [Authoring templates](resource-group-authoring-templates.md#parameters).
+- For guidance on deploying your solution to different environments, see [Development and test environments in Microsoft Azure](solution-dev-test-environments.md).
+- For details about using a KeyVault reference to pass secure values, see [Pass secure values during deployment](resource-manager-keyvault-parameter.md).
 

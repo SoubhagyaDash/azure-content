@@ -1,10 +1,26 @@
-<properties title="required" pageTitle="Custom markdown extensions used in our technical articles" description="Lists the custom markdown extensions that enable embedded videos, notes and tips, reusable content, and other item in azure.microsoft.com technical articles." metaKeywords="" services="" solutions="" documentationCenter="" authors="tysonn" videoId="" scriptId="" manager="required" />
+<properties
+    title="required"
+    pageTitle="Custom markdown extensions used in our technical articles"
+    description="Lists the custom markdown extensions that enable embedded videos, notes and tips, reusable content, and other item in azure.microsoft.com technical articles."
+    services=""
+    solutions=""
+    documentationCenter=""
+    authors="tysonn"
+    manager="carolz"
+    editor=""/>
 
-<tags ms.service="contributor-guide" ms.devlang="" ms.topic="article" ms.tgt_pltfrm="" ms.workload="" ms.date="01/22/2015" ms.author="tysonn" />
+<tags
+    ms.service="contributor-guide"
+    ms.devlang=""
+    ms.topic="article"
+    ms.tgt_pltfrm=""
+    ms.workload=""
+    ms.date="01/22/2015"
+    ms.author="tysonn"/>
 
 ## Markdown for Azure.microsoft.com
 
-For general markdown tips, see [Markdown Basics](https://help.github.com/articles/markdown-basics/) and our [markdown cheatsheet](./media/documents/markdown-cheatsheet.pdf?raw=true). If you need to create article crosslinks in markdown, see the [linking guidance] (./create-links-markdown.md#markdown-syntax-for-acom-relative-links.md/). 
+For general markdown tips, see [Markdown Basics](https://help.github.com/articles/markdown-basics/) and our [markdown cheatsheet](./media/documents/markdown-cheatsheet.pdf?raw=true). If you need to create article crosslinks in markdown, see the [linking guidance] (./create-links-markdown.md#markdown-syntax-for-acom-relative-links.md/).
 
 Azure.microsoft.com supports [fenced code blocks](https://help.github.com/articles/github-flavored-markdown/#fenced-code-blocks) and [syntax highlighting](https://help.github.com/articles/github-flavored-markdown/#syntax-highlighting). However, ACOM supports only one syntax highlighting color scheme, regardless of the language you specify in a code block.
 
@@ -69,7 +85,7 @@ Multiparagraph:
 
 ## Includes
 
-Reusable text fragments in our GitHub repository are called "includes". When you have text that needs to be used in multiple articles, you include a reference to the text fragments in the markdown files. The text fragment (the include) itself is a simple markdown (.md) file. It can contain any valid markdown, including text, links, and images. All include markdown files must be in [the /includes directory](https://github.com/Azure/azure-content/tree/master/includes) in the root of the repository. When the article is published, the include text is seamlessly integrated into the published topic.
+Reusable text in our GitHub repository resides in files that we call "includes". When you have text that needs to be used in multiple articles, you include a reference to that file of reusable information. The include itself is a simple markdown (.md) file. It can contain any valid markdown, including text, links, and images. All include markdown files must be in [the /includes directory](https://github.com/Azure/azure-content/tree/master/includes) in the root of the repository. When the article is published, the include text is seamlessly integrated into the published topic.
 
 - We use a specific syntax to reference an include.
 
@@ -78,9 +94,17 @@ Reusable text fragments in our GitHub repository are called "includes". When you
 ###Usage
 
 - Use includes wherever you need the same text to appear in multiple articles.
-- Includes are meant to be used for significant amounts of content - a paragraph or two, a shared procedure, or a shared section. Do not use them for anything smaller than a sentence; they are not for product names or incomplete sentences.
-- Don't embed includes within other includes. Bad things happen in the publishing system!
+
+- Includes are meant to be used for significant amounts of content - a paragraph or two, a shared procedure, or a shared section. Do not use them for anything smaller than a sentence; **they are not for product names**.
+
+- Ensure all the text in an include is written in complete sentences or phrases that do not depend on preceding text or following text in the article that references the include. Ignoring this guidance creates an untranslatable string in the article that breaks the localized experience. 
+
+- Don't embed includes within other includes. They are not supported by the DPS publishing system.
+
 - Don't share media between files. Use a separate file with a unique name for each include and article. Store the media file in the media folder associated with the include.
+
+- Don't use an include as the only content of an article.  Includes are meant to be supplemental to the content in the rest of the article.
+
 - Because all includes must be in the /includes directory, the path to an include from an article is always
 
     ../includes
@@ -142,13 +166,13 @@ Published article: [http://azure.microsoft.com/documentation/articles/web-sites-
 
 ## Technology and platform selectors
 
-Use technology and platform switchers in technical articles when you author multiple flavors of the same article to address differences in implementation across technologies or platforms. This is typically most applicable to our mobile platform content for developers. There are currently two different types of selectors, [simple selectors](#simple-selectors) and and [two-way selectors](#two-way-selectors).
+Use technology and platform switchers in technical articles when you author multiple flavors of the same article to address differences in implementation across technologies or platforms. This is typically most applicable to our mobile platform content for developers. There are currently two different types of selectors, [simple selectors](#simple-selectors) and [two-way selectors](#two-way-selectors).
 
->[AZURE.NOTE]Because the same selector markdown goes in each topic in the selection, we recommend placing the selector for your topic in an include, then referencing that include in all of your topics that use the same selector.
+Because the same selector markdown goes in each topic in the selection, we recommend placing the selector for your topic in an include, then referencing that include in all of your topics that use the same selector.
 
 ###<a id="simple-selectors"></a>Simple selectors
 
-Simple (one-way) selectors render as a set of option buttons right below the title. Use these buttons when customers only need to choose from topics in a single platform or technology set, such as .NET, Node.js, and Java  
+Simple (one-way) selectors render as a set of option buttons right below the title. Use these buttons when customers need to choose from topics in a single platform or technology set, such as .NET, Node.js, and Java.  Use the custom markdown extension for any selectors - do not use HTML for selectors.  
 
 See [Get started with Notification Hubs](http://azure.microsoft.com/documentation/articles/notification-hubs-windows-phone-get-started/) to see how the author created 8 versions of the same article, but used selectors to enable navigation across them all.
 
@@ -163,7 +187,7 @@ See [Get started with Notification Hubs](http://azure.microsoft.com/documentatio
 Example:
 
     > [AZURE.SELECTOR]
-    - [Windows Universal](../articles/notification-hubs-windows-store-dotnet-get-started/)
+    - [Universal Windows](../articles/notification-hubs-windows-store-dotnet-get-started/)
     - [Windows Phone](../articles/notification-hubs-windows-phone-get-started/)
     - [iOS](../articles/notification-hubs-ios-get-started/)
     - [Android](../articles/notification-hubs-android-get-started/)
@@ -178,7 +202,7 @@ The image above shows the rendering on azure.microsoft.com. On the rendered GitH
 
 ###<a id="two-way-selectors"></a>Two-way selectors
 
-Two-way selectors lets users select a topics from a 2 x n matrix. This is essential when an Azure technology, such as Mobile Services, supports multiple backend platforms as well as multiple clients. Keep in mind the following:
+Two-way selectors lets users select a topics from a two way matrix. This is essential when an Azure technology, such as Mobile Services, supports multiple backend platforms as well as multiple clients. Keep in mind the following:
 
 - While it was designed as `(Platform | Backend)`, the dropwdown text can now be customized.
 - You do not need a list item for every point in your matrix, but do only have an item where a topic URL exists and is not a duplicate.
@@ -222,5 +246,5 @@ The image above shows the rendering on azure.microsoft.com. On the rendered GitH
 
 ###Contributors' Guide Links
 
-- [Overview article](./../CONTRIBUTING.md)
+- [Overview article](./../README.md)
 - [Index of guidance articles](./contributor-guide-index.md)
